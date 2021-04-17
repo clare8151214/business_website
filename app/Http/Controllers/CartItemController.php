@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateCartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 class CartItemController extends Controller
 {
     /**
@@ -34,7 +36,21 @@ class CartItemController extends Controller
      */
     public function store(Request $request)
     {
-        $form = $request->all();
+        $messages = [
+            'required' => ':attribute 是必要的',
+            'between' => ':attribute 不再 :min 和 :max',
+        ];
+        $validator =  Validator::make($request->all(),[
+            'cart_id' => 'required | integer',
+            'product_id' => 'required | integer',
+            'quantity' => 'required | integer | between:1,10',
+        ],$messages);
+        if($validator->fails()){
+            return response($validator->errors(),400);
+        }
+        $form = $validator->validate();
+       // dd($form);
+        //$form = $request->all();
         DB::table('cart_items')->insert(['cart_id' => $form['cart_id'],
                                     'product_id' => $form['product_id'],
                                     'quantity' => $form['quantity'],
@@ -73,9 +89,9 @@ class CartItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCartItem $request, $id)
     {
-        $form = $request->all();
+        $form = $request->validated();
         DB::table('cart_items')->where('id',$id)->update([
                                     'quantity' => $form['quantity'],
                                     'updated_at' => now(),
