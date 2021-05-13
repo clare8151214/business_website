@@ -25,5 +25,5 @@ Route::group(['middleware' => 'check.dirty'],function () {
     Route::resource('products','ProductController');
 });
 
-Route::post('sighup','AuthController@signup');\
+Route::post('sighup','AuthController@signup');
 Route::post('login','AuthController@login');
