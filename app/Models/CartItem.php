@@ -9,15 +9,17 @@ class CartItem extends Model
 {
     use HasFactory;
     protected $guarded = [''];
-    protected $hidden = ['created_at'];
+    protected $hidden = [''];
     protected $appends = ['current_price'];
 
     public function getCurrentPriceAttribute(){
         return $this->quantity * 10;
     }
+
     public function product(){
         return $this->belongsTo(Product::class);
     }
+    
     public function cart(){
         return $this->belongsTo(Cart::class);
     }

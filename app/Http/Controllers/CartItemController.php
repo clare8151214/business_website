@@ -6,6 +6,8 @@ use App\Http\Requests\UpdateCartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Cart;
+use App\Models\CartItem;
 class CartItemController extends Controller
 {
     /**
@@ -48,16 +50,17 @@ class CartItemController extends Controller
         if($validator->fails()){
             return response($validator->errors(),400);
         }
+        
         $form = $validator->validate();
+        $cart = Cart::find($form['cart_id']);
+
+        $result = $cart->cartItems()->create(['product_id' => $form['product_id'],
+                                              'quantity' => $form['quantity'],]);
+
        // dd($form);
         //$form = $request->all();
-        DB::table('cart_items')->insert(['cart_id' => $form['cart_id'],
-                                    'product_id' => $form['product_id'],
-                                    'quantity' => $form['quantity'],
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                    ]);
-        return response()->json(true);
+   
+        return response()->json($result);
     }
 
     /**
@@ -92,10 +95,9 @@ class CartItemController extends Controller
     public function update(UpdateCartItem $request, $id)
     {
         $form = $request->validated();
-        DB::table('cart_items')->where('id',$id)->update([
-                                    'quantity' => $form['quantity'],
-                                    'updated_at' => now(),
-                                    ]);
+        $item = CartItem::find($id);
+        $item->update(['quantity'=>$form['quantity']]);
+       
         return response()->json(true);
     }
 
@@ -107,7 +109,7 @@ class CartItemController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('cart_items')->where('id',$id)->delete();
+        $item = CartItem::find($id)->delete();
         return response()->json(true);
     }
 }
