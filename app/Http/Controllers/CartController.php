@@ -22,7 +22,9 @@ class CartController extends Controller
         // $cartItems = DB::table('cart_items')->where('cart_id',$cart->id)->get();
         // $cart = collect($cart);
         // $cart['items'] = collect($cartItems);
-        $cart = Cart::with(['cartItems'])->firstOrCreate();
+        $user = auth()->user();
+        $cart = Cart::with(['cartItems'])->where('user_id',$user->id)
+                            ->firstOrCreate(['user_id' => $user->id]);
         return response($cart);
     }
 

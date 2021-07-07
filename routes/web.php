@@ -19,11 +19,17 @@ Route::get('/', function () {
 
 //Route::post('/','ProductController@create');
 
-Route::resource('carts','CartController');
-Route::resource('cart-items','CartItemController');
+
 Route::group(['middleware' => 'check.dirty'],function () {
     Route::resource('products','ProductController');
 });
 
-Route::post('sighup','AuthController@signup');
+Route::post('signup','AuthController@signup');
 Route::post('login','AuthController@login');
+
+Route::group(['middleware' => 'auth:api'],function () {
+    Route::get('user','AuthController@user');
+    Route::get('logout','AuthController@logout');
+    Route::resource('carts','CartController');
+    Route::resource('cart-items','CartItemController');
+});
